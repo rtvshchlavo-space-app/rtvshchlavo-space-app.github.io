@@ -144,6 +144,7 @@
                 <button type="button" class="submit" id="start">Start</button>
                 <button type="button" class="submit" id="stop">Try</button>
                 <button type="button" class="submit" id="reset">Reset</button>
+                <button type="button" class="submit" id="resetc">Reset Camera</button>
                 <div class="main-row">
                     <div class="formsubtitle">Upload your light curve to compare</div>
                     <input type="file" id="input-data" class="userdata">
@@ -174,6 +175,13 @@
                     <div class="input-container-metric ic2">
                         <input id="zscale" class="input" type="text" placeholder=" " />
                         <label class="placeholder"></label>
+                    </div>
+                </div>
+                <div class="main-row">
+                    <div class="formsubtitle">Sphere radius (relative)</div>
+                    <div class="input-container-metric ic2">
+                        <input id="sr" class="input" type="text" placeholder=" " />
+                        <label class="placeholder">1</label>
                     </div>
                 </div>
                 <button type="button" class="submit" id="edit">Edit</button>
@@ -286,6 +294,7 @@ var object2;
 var ownAxesAngle=0;
 var axesHelper;
 var arrowHelper;
+var sphereRadius=0.1;
 var dir;
 var arrowHelperP;
 var dirP;
@@ -373,9 +382,14 @@ document.getElementById('ut').onclick = function(){
 
 //Editor
 document.getElementById('edit').onclick=function(){
-    var xsc=Number(document.getElementById('xscale').value);
-    var ysc=Number(document.getElementById('yscale').value);
-    var zsc=Number(document.getElementById('zscale').value);
+    sphereRadius=parseFloat(document.getElementById('sr').value)*SCALE;
+    if(isNaN(sphereRadius))sphereRadius=0.1*SCALE;
+    var xsc=parseFloat(document.getElementById('xscale').value);
+    var ysc=parseFloat(document.getElementById('yscale').value);
+    var zsc=parseFloat(document.getElementById('zscale').value);
+    if(isNaN(xsc))xsc=1;
+    if(isNaN(ysc))ysc=1;
+    if(isNaN(zsc))zsc=1;
     var i = 1;
     var j = 1;
     var k = 2;
@@ -384,8 +398,8 @@ document.getElementById('edit').onclick=function(){
     console.log(gamma);
     console.log(phi);
     var euler = new THREE.Euler(0, phi, gamma);
-    object.geometry.applyMatrix( new THREE.Matrix4().makeRotationFromEuler( euler ) );
-    object2.geometry.applyMatrix( new THREE.Matrix4().makeRotationFromEuler( euler ) );
+    object.geometry.applyMatrix4( new THREE.Matrix4().makeRotationFromEuler( euler ) );
+    object2.geometry.applyMatrix4( new THREE.Matrix4().makeRotationFromEuler( euler ) );
     object.scale.set(xsc,ysc,zsc);
     object2.scale.set(xsc,ysc,zsc);
     object.rotation.z-=gamma;
@@ -459,6 +473,7 @@ var elCT=document.getElementById("ct");
 var startButton=document.getElementById("start");
 var stopButton=document.getElementById("stop");
 var resetButton=document.getElementById("reset");
+var resetcButton=document.getElementById("resetc");
 
 var conditionsButton=document.getElementById("conditions");
 var editorButton=document.getElementById("editor");
@@ -592,6 +607,12 @@ pauseLabel=true;
 }
 }
 
+resetcButton.onclick=function(){
+    controls.reset();
+    camera.position.set(0,0,SCALE+1);
+    camera.lookAt(0,0,0);
+}
+
 function onMouseMove( event ) {
 
 	// calculate mouse position in normalized device coordinates
@@ -605,7 +626,7 @@ function onMouseMove( event ) {
         console.log(mouse.x);
         console.log(mouse.y);
         
-        createSphere(0.2, p.point.x, p.point.y, p.point.z)
+        createSphere(sphereRadius, p.point.x, p.point.y, p.point.z)
     }
 
 }
@@ -728,7 +749,8 @@ if(startLabel){
     }
     general = general/(counter);
     // general = (general - 0.4) * 10
-    general=-2.5*Math.log10(general);
+    general=2.5*Math.log10(general);
+
     if(precessionParams[3]!=0.0){
     if(Math.floor(ownAxesAngle/360) < myChart.data.datasets.length){
         addData(myChart, ownAxesAngle%360/360, general, Math.floor(ownAxesAngle/360));
@@ -756,9 +778,7 @@ if(startLabel){
     }
     if(myChart.data.datasets[myChart.data.datasets.length-1].data[0].x==0 && myChart.data.datasets[myChart.data.datasets.length-1].data[0].y==0){
             myChart.data.datasets[myChart.data.datasets.length-1].data.splice(0, 1);
-            
     }
-    console.log(myChart.data.datasets.length)
 }
     }
 }
