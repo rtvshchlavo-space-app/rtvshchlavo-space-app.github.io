@@ -1,0 +1,762 @@
+<!DOCTYPE <!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="main.css">
+        <style>
+            body{
+                margin: 0px;
+                background-color: white;
+            }
+            .display{
+                width:50%;
+                height:50%;
+                border-radius: 12px;
+            }
+            .controllers{
+                width:49%;
+                height:50%;
+                position:absolute;
+                top:0px;
+                right:0px;
+                background-color: white;
+            }
+            .graph{
+                height:50%;
+                width: 100%;
+                position:absolute;
+                bottom:0px;
+                left:0px;
+                background-color:white;
+            }
+            .canvas{
+                height: 100%;
+                width: 100%;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="display" class="display"></div>
+        <div class="controllers">
+            <div class="main-row">
+            <button type="button" class="menu" id="conditions">Conditions</button>
+            <button type="button" class="menu" id="editor">Editor</button>
+            </div>
+            <input type="file" id="input-file">
+            <button type="button" class="submit" id="input-file-link-load">Load object</button>
+            <div class="formsubtitle" id="objectInfo">Size: </div>
+            <div id="conditionsdiv">
+                <div class="main-row">
+                    <div class="formsubtitle">Axis of rotation</div>
+                    <div class="input-container-metric ic2">
+                        <input id="x1" class="input" type="text" placeholder=" " />
+                        <div class="cut"></div>
+                        <label class="placeholder">x</label>
+                    </div>
+                    <div class="input-container-metric ic2">
+                        <input id="y1" class="input" type="text" placeholder=" " />
+                        <div class="cut"></div>
+                        <label class="placeholder">y</label>
+                    </div>
+                    <div class="input-container-metric ic2">
+                        <input id="z1" class="input" type="text" placeholder=" " />
+                        <div class="cut"></div>
+                        <label class="placeholder">z</label>
+                    </div>
+                    <div class="input-container-metric ic2">
+                        <input id="w1" class="input" type="text" placeholder=" " />
+                        <div class="cut"></div>
+                        <label class="placeholder">Ω°</label>
+                    </div>
+                    <button type="button" class="submit" id="rt">Apply</button>
+                </div>
+                <div class="main-row">
+                    <div class="formsubtitle">Axis of precession</div>
+                    <div class="input-container-metric ic2">
+                        <input id="x2" class="input" type="text" placeholder=" " />
+                        <div class="cut"></div>
+                        <label class="placeholder">x</label>
+                    </div>
+                    <div class="input-container-metric ic2">
+                        <input id="y2" class="input" type="text" placeholder=" " />
+                        <div class="cut"></div>
+                        <label class="placeholder">y</label>
+                    </div>
+                    <div class="input-container-metric ic2">
+                        <input id="z2" class="input" type="text" placeholder=" " />
+                        <div class="cut"></div>
+                        <label class="placeholder">z</label>
+                    </div>
+                    <div class="input-container-metric ic2">
+                        <input id="w2" class="input" type="text" placeholder=" " />
+                        <div class="cut"></div>
+                        <label class="placeholder">Ω°</label>
+                    </div>
+                    <button type="button" class="submit" id="pt">Apply</button>
+                </div>
+                <div class="main-row">
+                    <div class="formsubtitle">Directed light</div>
+                    <div class="input-container-metric ic2">
+                        <input id="x3" class="input" type="text" placeholder=" " />
+                        <div class="cut"></div>
+                        <label class="placeholder">x</label>
+                    </div>
+                    <div class="input-container-metric ic2">
+                        <input id="y3" class="input" type="text" placeholder=" " />
+                        <div class="cut"></div>
+                        <label class="placeholder">y</label>
+                    </div>
+                    <div class="input-container-metric ic2">
+                        <input id="z3" class="input" type="text" placeholder=" " />
+                        <div class="cut"></div>
+                        <label class="placeholder">z</label>
+                    </div>
+                    <div class="input-container-metric ic2">
+                        <input id="w3" class="input" type="text" placeholder=" " />
+                        <div class="cut"></div>
+                        <label class="placeholder">i</label>
+                    </div>
+                    <button type="button" class="submit" id="lt">Apply</button>
+                </div>
+                <div class="main-row">
+                    <div class="formsubtitle">Start Orientation</div>
+                    <div class="input-container-metric ic2">
+                        <input id="x4" class="input" type="text" placeholder=" " />
+                        <div class="cut"></div>
+                        <label class="placeholder">x°</label>
+                    </div>
+                    <div class="input-container-metric ic2">
+                        <input id="y4" class="input" type="text" placeholder=" " />
+                        <div class="cut"></div>
+                        <label class="placeholder">y°</label>
+                    </div>
+                    <div class="input-container-metric ic2">
+                        <input id="z4" class="input" type="text" placeholder=" " />
+                        <div class="cut"></div>
+                        <label class="placeholder">z°</label>
+                    </div>
+                    <button type="button" class="submit" id="ct">Apply</button>
+                </div>
+                <button type="button" class="submit" id="start">Start</button>
+                <button type="button" class="submit" id="stop">Try</button>
+                <button type="button" class="submit" id="reset">Reset</button>
+                <div class="main-row">
+                    <div class="formsubtitle">Upload your light curve to compare</div>
+                    <input type="file" id="input-data" class="userdata">
+                    <button type="button" class="submit" id="ut">Load Data</button>
+                </div>
+                <div class="instuction">
+                    Notice: camera looks from z axis to the object at (0,0,0) position.
+                    Instruction: 1.* upload an asteroid, format .obj or .wv; 2. set axes and angular velocities (degree/second), axes will be auto-normalized. Default precession velocity is 0; 3. set light direction and starting orientation. 4. click Try to check movement; 5. click Start to see build the light curve. If you want to compare, upload your own light curve from txt file (each line has to have '[x] [y]' format); 6. Have fun :)
+                </div>
+            </div>
+            <div id="editordiv">
+                <div class="main-row">
+                    <div class="formsubtitle">X scale</div>
+                    <div class="input-container-metric ic2">
+                        <input id="xscale" class="input" type="text" placeholder=" " />
+                        <label class="placeholder"></label>
+                    </div>
+                </div>
+                <div class="main-row">
+                    <div class="formsubtitle">Y scale</div>
+                    <div class="input-container-metric ic2">
+                        <input id="yscale" class="input" type="text" placeholder=" " />
+                        <label class="placeholder"></label>
+                    </div>
+                </div>
+                <div class="main-row">
+                    <div class="formsubtitle">Z scale</div>
+                    <div class="input-container-metric ic2">
+                        <input id="zscale" class="input" type="text" placeholder=" " />
+                        <label class="placeholder"></label>
+                    </div>
+                </div>
+                <button type="button" class="submit" id="edit">Edit</button>
+    
+            </div>
+        </div>
+
+        <div class="graph">
+            <canvas id="myChart" class="canvas"></canvas>
+            <!--<div id="calculator" ></div>-->
+        </div>
+
+
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
+        <script src="https://www.desmos.com/api/v1.6/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+        <script type="module" src="parseObjToTOBJ.js"></script>
+        <script src="long-press-event-master/dist/long-press-event.min.js"></script>
+        <script src="controllers.js"></script>
+        <script>
+            var ctx = document.getElementById('myChart').getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    labels: 'Label',
+                    datasets: [{
+                        label: 'Light Curve',
+                        data: [
+                            {x:0,y:0},
+                        ],
+                        backgroundColor: [
+                            'rgba(251,140,0, 0.95)',
+                        ],
+                        borderColor: [
+                            'rgba(251,140,0, 0.95)',
+                        ],
+                        borderWidth: 1,
+                        showLine:true,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            display: true,
+                            grid: {display:false},
+                        },
+                        x: {
+                            display:true,
+                            beginAtZero: true,
+                            grid: {display:false},
+                        }
+                    },
+                    devicePixelRatio: 1,
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation:{duration:0}
+                }
+            });
+            function addData(chart, datax, datay, index) {
+                
+                 if(datax>chart.data.datasets[0].data[chart.data.datasets[0].data.length-1].x){ 
+                     chart.data.datasets[0].data.push({x:datax,y:datay});
+                 }
+                 else if (datax>chart.data.datasets[0].data[0].x) {
+                    chart.data.datasets[0].data.unshift({x:datax,y:datay});
+                 }else {
+                 for(var i=1; i < chart.data.datasets[0].data.length-1; i++){
+                     if(chart.data.datasets[0].data[i-1].x<datax && datax<chart.data.datasets[0].data[i+1].x){
+                         if(datax==chart.data.datasets[0].data[i].x) break;
+                         chart.data.datasets[0].data[i].splice(i, 0, {x:datax,y:datay});
+                         break;
+                     }
+                    }
+                }
+    chart.update();
+}
+        </script>
+        <script>
+//             var valuesX=[]
+//             var valuesY=[]
+//  var elt = document.getElementById('calculator');
+//   var calculator = Desmos.GraphingCalculator(elt, 
+//   { 
+//     expressions: false,
+//     showGrid:false,
+//     xAxisLabel:"Degree",
+// });
+//   calculator.setExpression({
+//   type: 'table',
+//   points:true,
+//   columns: [
+//     {
+//       latex: 'x',
+//       values: valuesX,
+//     },
+//     {
+//       latex: 'y',
+//       values: valuesY,
+//       dragMode: Desmos.DragModes.XY
+//     },
+//   ]
+// });
+        </script>
+        <script type="module">
+
+import {parseOBJ} from "./parseObjToTOBJ.js";
+import { OrbitControls } from "https://threejs.org/examples/jsm/controls/OrbitControls.js";
+
+// ---------------------------------------------------------------------------------------------
+// Controllers
+
+var object;
+var object2;
+var ownAxesAngle=0;
+var axesHelper;
+var arrowHelper;
+var dir;
+var arrowHelperP;
+var dirP;
+var animationLabel=true;
+var elementFile=document.getElementById('input-file');
+document.getElementById('input-file-link-load').onclick = function(){
+  var fileToLoad = document.getElementById("input-file").files[0];
+
+  var fileReader = new FileReader();
+  fileReader.onload = function(fileLoadedEvent){
+        var textFromFileLoaded = fileLoadedEvent.target.result;
+        object=parseOBJ(textFromFileLoaded, new THREE.MeshLambertMaterial({color: 0xffffff, transparent: true}));
+        scene.add(object);
+      
+        object2=parseOBJ(textFromFileLoaded, new THREE.MeshLambertMaterial({color: 0xffffff}));
+        scene2.add(object2);
+        box = new THREE.Box3().setFromObject( object );
+        SCALE=Math.max(box.max.x,box.max.y,box.max.z);
+        camera.position.set(0,0,SCALE+1);
+
+        box = new THREE.Box3().setFromObject( object2 );
+        SCALE=Math.max(box.max.x,box.max.y,box.max.z);
+        camera2.left=-SCALE*WIDTH2/HEIGHT2;
+        camera2.right=SCALE*WIDTH2/HEIGHT2;
+        camera2.top=SCALE;
+        camera2.bottom=-SCALE;
+        camera2.updateProjectionMatrix();
+        document.getElementById("objectInfo").innerText="Size: "+SCALE
+
+        axesHelper = new THREE.AxesHelper( SCALE*1.1 );
+        object.attach(axesHelper);
+
+        dir = new THREE.Vector3( 1, 0, 0 );
+        dir.normalize();
+        const origin = new THREE.Vector3( 0, 0, 0 );
+        const length = SCALE*1.3;
+        const hex = 0xffff00;
+        arrowHelper = new THREE.ArrowHelper( dir, origin, length, hex , SCALE*0.1, SCALE*0.05);
+        object.attach(arrowHelper);
+
+
+        dirP = new THREE.Vector3( 1, 0, 0 );
+        dirP.normalize();
+        const hexP = 0xffffff;
+        arrowHelperP = new THREE.ArrowHelper( dirP, origin, length, hexP , SCALE*0.1, SCALE*0.05);
+        arrowHelperP.visible=false;
+        scene.add(arrowHelperP);
+  };
+  fileReader.readAsText(fileToLoad, "UTF-8");
+}
+
+document.getElementById('ut').onclick = function(){
+  var fileToLoad = document.getElementById("input-data").files[0];
+  var fileReader = new FileReader();
+  fileReader.onload = function(fileLoadedEvent){
+        var textFromFileLoaded = fileLoadedEvent.target.result;
+        myChart.data.datasets.unshift({
+                        label: 'Own Light Curve',
+                        data: [
+                            {x:0,y:0},
+                        ],
+                        backgroundColor: [
+                            'rgba(0,0,0, 1)',
+                        ],
+                        borderColor: [
+                            'rgba(0,0,0, 1)',
+                        ],
+                        borderWidth: 1,
+                        showLine:true,
+                        tension: 0.1
+                    });
+        var lines=textFromFileLoaded.split('\n');
+        var words;
+        for(var i=0;i< lines.length;i++){
+            lines[i]=lines[i].replace('\r', ' ');
+            words=lines[i].split(' ');
+            myChart.data.datasets[0].data.push({x:parseFloat(words[0]),y:parseFloat(words[1])});
+            console.log(myChart.data.datasets[0].data);
+        }
+        myChart.update();
+
+  };
+  fileReader.readAsText(fileToLoad, "UTF-8");
+}
+
+//Editor
+document.getElementById('edit').onclick=function(){
+    var xsc=Number(document.getElementById('xscale').value);
+    var ysc=Number(document.getElementById('yscale').value);
+    var zsc=Number(document.getElementById('zscale').value);
+    var i = 1;
+    var j = 1;
+    var k = 2;
+    var gamma = -Math.atan2(j, i);
+    var phi=-Math.atan2(k, i);
+    console.log(gamma);
+    console.log(phi);
+    var euler = new THREE.Euler(0, phi, gamma);
+    object.geometry.applyMatrix( new THREE.Matrix4().makeRotationFromEuler( euler ) );
+    object2.geometry.applyMatrix( new THREE.Matrix4().makeRotationFromEuler( euler ) );
+    object.scale.set(xsc,ysc,zsc);
+    object2.scale.set(xsc,ysc,zsc);
+    object.rotation.z-=gamma;
+    object.rotation.y-=phi;
+    object2.rotation.z-=gamma;
+    object2.rotation.y-=phi;
+    myChart.data.datasets[0].data=[{x:0,y:0}];
+    console.log(xsc, ysc, zsc);
+}
+
+//raycaster
+var sphere;
+var sphere2;
+function createSphere(r,x,y,z){
+    sphere = new THREE.Mesh(new THREE.SphereBufferGeometry(r, 32,32), new THREE.MeshLambertMaterial({color:0xffffff}));
+    sphere2 = new THREE.Mesh(new THREE.SphereBufferGeometry(r, 32,32), new THREE.MeshLambertMaterial({color:0xffffff}));
+    sphere.position.set(x,y,z)
+    sphere2.position.set(x,y,z)
+    object.attach(sphere);
+    object2.attach(sphere2);
+    
+}
+
+// const group1 = new THREE.Group();
+// object.attach(object);
+
+// const group2 = new THREE.Group();
+// object2.attach(object2);
+
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+var elRX=document.getElementById("x1");
+var elRY=document.getElementById("y1");
+var elRZ=document.getElementById("z1");
+var elRW=document.getElementById("w1");
+var elRT=document.getElementById("rt");
+
+var elPX=document.getElementById("x2");
+var elPY=document.getElementById("y2");
+var elPZ=document.getElementById("z2");
+var elPW=document.getElementById("w2");
+var elPT=document.getElementById("pt");
+
+var elLX=document.getElementById("x3");
+var elLY=document.getElementById("y3");
+var elLZ=document.getElementById("z3");
+var elLW=document.getElementById("w3");
+var elLT=document.getElementById("lt");
+
+var elCX=document.getElementById("x4");
+var elCY=document.getElementById("y4");
+var elCZ=document.getElementById("z4");
+var elCT=document.getElementById("ct");
+
+var startButton=document.getElementById("start");
+var stopButton=document.getElementById("stop");
+var resetButton=document.getElementById("reset");
+
+var conditionsButton=document.getElementById("conditions");
+var editorButton=document.getElementById("editor");
+var conditions=document.getElementById("conditionsdiv");
+var editor=document.getElementById("editordiv");
+
+var menu=true;//true=conditions, false=editor
+conditionsButton.onclick=function(){
+    if(!menu){
+        conditions.style.display = 'inline-block';
+        editor.style.display = 'none';
+        menu=!menu;
+    }
+}
+editorButton.onclick=function(){
+    if(menu){
+        editor.style.display = 'inline-block';
+        conditions.style.display = 'none';
+        
+        menu=!menu;
+    }
+}
+
+var rotationParams=[1,0,0,3.413];
+elRT.onclick=function(){
+    rotationParams=[parseFloat(elRX.value),parseFloat(elRY.value),parseFloat(elRZ.value), parseFloat(elRW.value)];
+    for(var i=0;i < 3; i++){
+        if(rotationParams[i]==undefined || isNaN(rotationParams[i])){
+            rotationParams[i]=0;
+        }
+    }
+    if(rotationParams[3]==undefined || isNaN(rotationParams[3])){
+        rotationParams[3]=5;
+    }
+    dir = new THREE.Vector3( rotationParams[0], rotationParams[1], rotationParams[2] );
+        dir.normalize();
+        arrowHelper.setDirection(dir);
+
+    console.log(dir);
+
+}
+
+var precessionParams=[1,0,0,0.0];
+elPT.onclick=function(){
+    precessionParams=[parseFloat(elPX.value),parseFloat(elPY.value),parseFloat(elPZ.value), parseFloat(elPW.value)];
+    for(var i=0;i < 3; i++){
+        if(precessionParams[i]==undefined || isNaN(precessionParams[i])){
+            precessionParams[i]=0;
+        }
+    }
+    if(precessionParams[3]==undefined || isNaN(precessionParams[3])){
+        precessionParams[3]=0.0;
+    }
+    dirP = new THREE.Vector3( precessionParams[0],precessionParams[1], precessionParams[2] );
+    dirP.normalize();
+    arrowHelperP.setDirection(dirP);
+
+    if(precessionParams[3]!=0){
+        arrowHelperP.visible=true;
+    }
+    console.log(dirP);
+
+}
+
+var lightPosition=[1,1,1,0.7];
+elLT.onclick=function(){
+    lightPosition=[parseFloat(elLX.value),parseFloat(elLY.value),parseFloat(elLZ.value), parseFloat(elLW.value)];
+    for(var i=0;i < 3; i++){
+        if(lightPosition[i]==undefined || isNaN(lightPosition[i])){
+            lightPosition[i]=0;
+        }
+    }
+    if(lightPosition[3]==undefined || isNaN(lightPosition[3])){
+        lightPosition[3]=0.7;
+    }
+    directionalLight.position.set(lightPosition[0],lightPosition[1],lightPosition[2])
+    directionalLight.intensity=lightPosition[3];
+    directionalLight2.position.set(lightPosition[0],lightPosition[1],lightPosition[2])
+    directionalLight2.intensity=lightPosition[3];
+}
+
+var startOrientation=[0,0,0];
+elCT.onclick=function(){
+    startOrientation=[parseFloat(elCX.value)*Math.PI/180.0,parseFloat(elCY.value)*Math.PI/180.0,parseFloat(elCZ.value)*Math.PI/180.0];
+    for(var i=0;i < 3; i++){
+        if(startOrientation[i]==undefined || isNaN(startOrientation[i])){
+            startOrientation[i]=0.0;
+        }
+    }
+    object.rotation.set(startOrientation[0],startOrientation[1],startOrientation[2]);
+    object2.rotation.set(startOrientation[0],startOrientation[1],startOrientation[2]);
+}
+
+var startLabel=false;
+var startFirst=false;
+startButton.onclick=function(){
+object.rotation.set(startOrientation[0],startOrientation[1],startOrientation[2]);
+if(startLabel){
+    myChart.data.datasets[0].data=[{x:0,y:0}];
+    myChart.update();
+    startButton.innerText="Start"
+    startLabel=false;
+}else{
+    startButton.innerText="Clear"
+startLabel=true;
+}
+if(!startFirst){
+    if(pauseLabel){
+    stopButton.innerText="Continue"
+    pauseLabel=false;
+}else{
+    stopButton.innerText="Stop"
+pauseLabel=true;
+}
+}
+startFirst=true;
+}
+
+resetButton.onclick=function(){
+    document.location.reload();
+}
+
+var pauseLabel=false;
+stopButton.onclick=function(){
+if(pauseLabel){
+    stopButton.innerText="Continue"
+    pauseLabel=false;
+}else{
+    stopButton.innerText="Stop"
+pauseLabel=true;
+}
+}
+
+function onMouseMove( event ) {
+
+	// calculate mouse position in normalized device coordinates
+	// (-1 to +1) for both components
+
+	mouse.x = ( event.clientX / window.innerWidth ) * 4 - 1;
+	mouse.y = - ( event.clientY / window.innerHeight ) *4 + 1;
+    raycaster.setFromCamera( mouse, camera );
+    const intersects = raycaster.intersectObjects( scene.children );
+    for (var p of intersects) {
+        console.log(mouse.x);
+        console.log(mouse.y);
+        
+        createSphere(0.2, p.point.x, p.point.y, p.point.z)
+    }
+
+}
+
+window.addEventListener( 'click', onMouseMove);
+
+
+// ---------------------------------------------------------------------------------------------
+// Display
+
+var WIDTH=window.innerWidth/2;
+var HEIGHT=window.innerHeight/2;
+
+window.addEventListener( 'resize', onWindowResize, false );
+function onWindowResize(){
+    WIDTH=window.innerWidth/2;
+    HEIGHT=window.innerHeight/2;
+
+    camera.aspect = WIDTH / HEIGHT;
+    camera.updateProjectionMatrix();
+
+    camera2.left=-SCALE*WIDTH2/HEIGHT2;
+        camera2.right=SCALE*WIDTH2/HEIGHT2;
+        camera2.top=SCALE;
+        camera2.bottom=-SCALE;
+        camera2.updateProjectionMatrix();
+
+    renderer.setSize( WIDTH, HEIGHT );
+}
+
+const scene = new THREE.Scene();
+var SCALE=1000;
+const camera = new THREE.PerspectiveCamera( 45, WIDTH / HEIGHT, 1, 1000 );
+camera.position.set(0,0,5);
+
+
+var box;
+var object;
+
+// const sphere3 = new THREE.SphereGeometry(1, 16, 16);
+// const material3 = new THREE.MeshPhongMaterial( { color: 0xffffff } );
+// const obj3 = new THREE.Mesh( sphere3, material3 );
+// scene.add(obj3);
+
+//light
+const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.7 );
+directionalLight.position.set(100, 100, 100)
+scene.add( directionalLight );
+
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize( WIDTH, HEIGHT );
+document.getElementById("display").appendChild( renderer.domElement );
+
+
+// ---------------------------------------------------------------------------------------------
+// Background scene
+
+const WIDTH2=window.innerWidth;
+const HEIGHT2=window.innerHeight;
+const scene2=new THREE.Scene();
+const directionalLight2 = new THREE.DirectionalLight( 0xffffff, 0.7 );
+directionalLight2.position.set(100, 100, 100)
+scene2.add( directionalLight2 );
+var SCALE=1000;
+const camera2 = new THREE.OrthographicCamera(  WIDTH2/-SCALE,  WIDTH2/SCALE,  HEIGHT2/SCALE, HEIGHT2/-SCALE, 0.1, 100000 );
+camera2.position.set(0,0,1000)
+var object2;
+
+const rtTexture = new THREE.WebGLRenderTarget( WIDTH2, HEIGHT2, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat, type: THREE.FloatType } );
+
+//orbitcontrols
+var controls = new OrbitControls(camera, renderer.domElement);
+    controls.rotateSpeed = 1.0;
+    controls.zoomSpeed = 1.2;
+    controls.panSpeed = 0.8;
+    controls.enableZoom = true;
+    controls.enablePan = true;
+    controls.enableDamping = true;
+    controls.DampingFactor = 0.0;
+// ---------------------------------------------------------------------------------------------
+// Loop
+// scene.add(group1);
+// scene2.add(group2);
+function animate() {
+    if (!animationLabel){
+        return 0;
+    }
+	requestAnimationFrame( animate );
+if(object!=undefined){
+    renderer.clear();
+    renderer.setRenderTarget( null );
+    renderer.render(scene, camera);
+    if(pauseLabel){
+
+    object.rotateOnAxis(dir, Math.PI/180.0*rotationParams[3]);
+    object.rotateOnAxis(dirP, Math.PI/180.0*precessionParams[3]);
+    dir.applyAxisAngle(dirP, Math.PI/180.0*precessionParams[3]);
+    arrowHelper.setDirection(dir);
+
+    
+if(startLabel){
+    ownAxesAngle+=rotationParams[3];
+    object2.rotateOnAxis(dir, Math.PI/180.0*rotationParams[3]);
+    object2.rotateOnAxis(dirP, Math.PI/180.0*precessionParams[3]);
+
+
+    renderer.setRenderTarget( rtTexture );
+	renderer.render( scene2, camera2 );
+    var read = new Float32Array( WIDTH2*HEIGHT2*4 );
+    var general=0;
+    var counter=0;
+    renderer.readRenderTargetPixels( rtTexture, 1, 1, WIDTH2-1, HEIGHT2-1, read );
+    for(var i=1; i < WIDTH2*HEIGHT2*4; i+=4){
+        if (read[i]>0.05)
+        {
+            counter++
+            general+=read[i];
+        }
+
+    }
+    general = general/(counter);
+    // general = (general - 0.4) * 10
+    general=-2.5*Math.log10(general);
+    if(precessionParams[3]!=0.0){
+    if(Math.floor(ownAxesAngle/360) < myChart.data.datasets.length){
+        addData(myChart, ownAxesAngle%360/360, general, Math.floor(ownAxesAngle/360));
+    }else{
+        var arr=myChart.data.datasets[myChart.data.datasets.length-1].data;
+        myChart.data.datasets.push({
+                        label: 'Light Curve '+(1+Math.floor(ownAxesAngle/360)),
+                        data: [
+                        {x:0,y:arr[arr.length-1].y}
+                        ],
+                        backgroundColor: [
+                            'rgba(251,'+Math.floor(Math.cos(Math.floor(ownAxesAngle/360)/5*Math.PI)*140)+','+Math.floor(Math.sin(Math.floor(ownAxesAngle/360)/20*Math.PI)*200)+', 0.95)',
+                        ],
+                        borderColor: [
+                        'rgba(251,'+Math.floor(Math.cos(Math.floor(ownAxesAngle/360)/5*Math.PI)*140)+','+Math.floor(Math.sin(Math.floor(ownAxesAngle/360)/20*Math.PI)*200)+', 0.95)',
+                        ],
+                        borderWidth: 1,
+                        showLine:true,
+                        tension: 0.1
+                    });
+        addData(myChart, ownAxesAngle%360/360, general, Math.floor(ownAxesAngle/360));
+    }
+    }else{
+        addData(myChart, ownAxesAngle%360/360, general, myChart.data.datasets.length-1);
+    }
+    if(myChart.data.datasets[myChart.data.datasets.length-1].data[0].x==0 && myChart.data.datasets[myChart.data.datasets.length-1].data[0].y==0){
+            myChart.data.datasets[myChart.data.datasets.length-1].data.splice(0, 1);
+            
+    }
+    console.log(myChart.data.datasets.length)
+}
+    }
+}
+}
+animate();
+
+// ---------------------------------------------------------------------------------------------
+        </script>
+        
+    </body>
+</html>
