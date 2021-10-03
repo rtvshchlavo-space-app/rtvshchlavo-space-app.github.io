@@ -190,10 +190,6 @@
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
-        <script src="https://www.desmos.com/api/v1.6/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
-        <script type="module" src="parseObjToTOBJ.js"></script>
-        <script src="long-press-event-master/dist/long-press-event.min.js"></script>
-        <script src="controllers.js"></script>
         <script>
             var ctx = document.getElementById('myChart').getContext('2d');
             var myChart = new Chart(ctx, {
@@ -236,21 +232,21 @@
             });
             function addData(chart, datax, datay, index) {
                 
-                 if(datax>chart.data.datasets[0].data[chart.data.datasets[0].data.length-1].x){ 
-                     chart.data.datasets[0].data.push({x:datax,y:datay});
-                 }
-                 else if (datax>chart.data.datasets[0].data[0].x) {
-                    chart.data.datasets[0].data.unshift({x:datax,y:datay});
-                 }else {
-                 for(var i=1; i < chart.data.datasets[0].data.length-1; i++){
-                     if(chart.data.datasets[0].data[i-1].x<datax && datax<chart.data.datasets[0].data[i+1].x){
-                         if(datax==chart.data.datasets[0].data[i].x) break;
-                         chart.data.datasets[0].data[i].splice(i, 0, {x:datax,y:datay});
-                         break;
-                     }
-                    }
+                if(datax > chart.data.datasets[index].data[chart.data.datasets[index].data.length-1].x){ 
+                    chart.data.datasets[index].data.push({x:datax,y:datay});
                 }
-    chart.update();
+                else if (datax < chart.data.datasets[index].data[0].x) {
+                   chart.data.datasets[index].data.unshift({x:datax,y:datay});
+                }else {
+                for(var i=0; i < chart.data.datasets[index].data.length-1; i++){
+                    if(chart.data.datasets[index].data[i].x<datax && datax<chart.data.datasets[index].data[i+1].x){
+                        if(datax==chart.data.datasets[index].data[i].x) break;
+                        chart.data.datasets[index].data.splice(i+1, 0, {x:datax,y:datay});
+                        break;
+                    }
+                   }
+               }
+   chart.update();
 }
         </script>
         <script>
@@ -280,8 +276,6 @@
 // });
         </script>
         <script type="module">
-
-import {parseOBJ} from "./parseObjToTOBJ.js";
 import { OrbitControls } from "https://threejs.org/examples/jsm/controls/OrbitControls.js";
 
 // ---------------------------------------------------------------------------------------------
@@ -412,6 +406,22 @@ function createSphere(r,x,y,z){
     sphere2.position.set(x,y,z)
     object.attach(sphere);
     object2.attach(sphere2);
+    myChart.data.datasets.push({
+                        label: 'Light Curve',
+                        data: [
+                            {x:0,y:0},
+                        ],
+                        backgroundColor: [
+                            'rgba(251,140,0, 0.95)',
+                        ],
+                        borderColor: [
+                            'rgba(251,140,0, 0.95)',
+                        ],
+                        borderWidth: 1,
+                        showLine:true,
+                        tension: 0.1
+                    })
+
     
 }
 
@@ -756,6 +766,57 @@ if(startLabel){
 animate();
 
 // ---------------------------------------------------------------------------------------------
+
+import {Geometry, Face3} from "https://threejs.org/examples/jsm/deprecated/Geometry.js"
+
+function parseOBJ(text, material){
+    let geometry = new Geometry();
+
+    if ( text.indexOf( '\r\n' ) !== - 1 ) {
+
+        // This is faster than String.split with regex that splits on both
+        text = text.replace( /\r\n/g, '\n' );
+
+    }
+
+    if ( text.indexOf( '\\\n' ) !== - 1 ) {
+
+        // join lines separated by a line continuation character (\)
+        text = text.replace( /\\\n/g, '' );
+
+    }
+
+    const lines = text.split( '\n' );
+var words;
+
+
+for(var i=0;i<lines.length;i++){
+words=lines[i].split(' ');
+
+if(words[0]=='v'){
+geometry.vertices.push(
+  new THREE.Vector3(
+    parseFloat(words[1]),
+    parseFloat(words[2]),
+    parseFloat(words[3])
+  ) //v
+);
+
+} else if (words[0] == 'f') {
+    geometry.faces.push(
+        new Face3(
+            parseInt(words[1])-1,
+            parseInt(words[2])-1,
+            parseInt(words[3])-1
+        )//f
+);
+}
+}
+geometry.computeFaceNormals();
+var bufferGeometry = geometry.toBufferGeometry();
+
+return new THREE.Mesh(bufferGeometry, material);
+}
         </script>
         
     </body>
